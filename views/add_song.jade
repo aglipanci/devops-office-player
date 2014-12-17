@@ -1,0 +1,56 @@
+doctype html
+html(lang="en")
+  head
+    title= title
+    link(rel='stylesheet', href='//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css')
+    script(src='//code.jquery.com/jquery-1.10.1.min.js')
+    script(src='//code.jquery.com/ui/1.10.4/jquery-ui.js')
+    script(src='//cdn.socket.io/socket.io-1.0.0.js')
+   
+
+
+  body
+    #title(style='margin: 50px auto 20px; border-bottom: 1px solid #ccc; padding:30px 30px 10px; text-align:center; color:#6a6a6a;font-size:50px; max-width:290px;font-family:\'helvetica\';')
+      |YouTube
+
+    #container(style='max-width: 290px; margin: 0px auto; background: #eee; border: 1px solid #ccc; padding: 30px;')
+      input(type='text', placeholder='URL nga YouTube', style='padding: 10px; width: 100%; box-sizing: border-box; border: 1px solid #ccc; margin-bottom:10px')#videoID
+      input(type='submit', value="Dergo", onclick="sentVideo();" style='display: block; width: 100%; padding: 10px 0; background: rgb(67, 148, 236); border: 1px solid rgb(32, 121, 202); color: #fff; text-transform: uppercase; font-size: 14px; box-shadow: 0px 1px 1px rgba(255, 255, 255, 0.4) inset; text-shadow: 1px 1px 0 rgb(32, 121, 202);')
+     #mesazhi(style='max-width: 290px; text-align: center; color: #fff; background: rgb(137, 226, 54); font-family: \'helvetica\'; text-transform: uppercase; padding: 10px 30px; margin: 20px auto 0; border: 1px solid rgb(113, 194, 38);display:none;')
+      |U shtua me sukses
+
+  script.
+        var socket = io.connect('http://localhost');
+        function sentVideo() {  
+                        var expr = /(?:v=)([^&]+)/;
+                        var userInput = document.getElementById("videoID").value;
+                        var vId = userInput.match(expr)[1];
+                    //  var vId = document.getElementById("videoID").value;
+                        socket.emit('userVid', vId);
+                        document.getElementById("videoID").value = '';
+                        $('#mesazhi').css("display", "block");
+                     setTimeout(hideMsg,5000);
+                        
+
+           }
+        function hideMsg(){
+         $('#mesazhi').css("display", "none");
+        }
+  script.
+    $(function() {
+        $("#slider").slider({min: 0, max: 100});
+
+        var startPos = '$("#slider").slider("value");', endPos = '';
+
+        $("#slider").on("slidestop", function(event, ui) {
+            endPos = ui.value;
+
+            if (startPos != endPos) {
+                socket.emit('userVol', endPos);
+            }
+
+            startPos = endPos;
+        });
+    });
+  #sliderContainer(style='max-width: 290px; margin: 20px auto 0; padding: 30px; background: #eee; border: 1px solid #ccc;') 
+    #slider
